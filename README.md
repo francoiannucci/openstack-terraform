@@ -90,9 +90,76 @@ All the default fields must be filled in
 The provider section will depend on the infrastructure.
 In the variables for the resources we must complete the following fields:
 
-project_name -> name of the project to create
-project_desc -> description of the project to create
-id_domain -> ID of the domain where this project will be created
+     #Variables para autenticación
+    ```terraform
+    variable  "openstack_user_name" {
+    
+    description =  "Usuario administrador con el que vamos a crear el proyecto"
+    
+    default =  "admin"
+    
+    }
+    
+    variable  "openstack_password" {
+    
+    description =  "Contraseña para el usuario que va a crear los recursos"
+    
+    type =  string
+    
+    sensitive =  true
+    
+    }
+    
+    variable  "openstack_tenant_name" {
+    
+    description =  "Proyecto donde se autentica el usuario administrador"
+    
+    default =  "admin"
+    
+    }
+    
+    variable  "openstack_auth_url" {
+    
+    description =  "URL de la api del entorno de Openstack con /v3"
+    
+    default =  "http://10.24.4.60:5000/v3"
+    
+    }
+    
+    variable  "openstack_region" {
+    
+    description =  "Region Openstack"
+    
+    default =  "RegionOne"
+    
+    }
+    
+    ## Variables para recursos
+    
+    variable  "project_name" {
+    
+    description =  "Nombre del proyecto que vamos a crear"
+    
+    default =  "test-franco"
+    
+    }
+    
+    variable  "project_desc" {
+    
+    description =  "Descripcion del proyecto que vamos a crear"
+    
+    default =  "test-franco"
+    
+    }
+    
+    variable  "id_dominio" {
+    
+    description =  "ID de dominio sobre"
+    
+    default =  "043d786cdc264ba6a1dc640f4be7f732"
+    
+    }
+```terraform
 
 
 to initialise the workspace, execute the following command.
