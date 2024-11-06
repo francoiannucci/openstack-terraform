@@ -8,7 +8,6 @@ deploy-project/
 |
 ├── mv_create/
 │   ├── main.tf
-│   ├── outputs.tf
 │   ├── resource.tf
 │   └── variables.tf
 |
@@ -70,7 +69,7 @@ It is necessary to install terraform, for this I attach the URL [hashicorp](http
 
 
 In all the directories, we will find a file `variables.tf`
-This is the only one we will have to modify as we want to create the project.
+This is the only one we will have to modify and inside it the variables with the `default` value.
 
 In the first two steps we will be asked for the credentials of the administrator user, in the third and fourth steps the credentials of the created user will be used.
 
@@ -78,7 +77,7 @@ It is also important to check that the `terraform.tfstate` file is generated, as
 
  1. **First execution**
 
-	`deploy-project/project_userdom/project/variables.tf`
+     `deploy-project/project_userdom/project/variables.tf`
 
 For this code we will need to know the ID of the domain where we will deploy the project.
 
@@ -90,19 +89,21 @@ All the default fields must be filled in
 The provider section will depend on the infrastructure.
 In the variables for the resources we must complete the following fields:
 
-     #Variables para autenticación
-    ```terraform
+```terraform
+
+     #Variables for authentication
+     
     variable  "openstack_user_name" {
     
-    description =  "Usuario administrador con el que vamos a crear el proyecto"
+    description =  "Administrator user with which we are going to create the project"
     
-    default =  "admin"
+    default =  ""
     
     }
     
     variable  "openstack_password" {
     
-    description =  "Contraseña para el usuario que va a crear los recursos"
+    description =  "Password for the user who is going to create the resources"
     
     type =  string
     
@@ -112,17 +113,17 @@ In the variables for the resources we must complete the following fields:
     
     variable  "openstack_tenant_name" {
     
-    description =  "Proyecto donde se autentica el usuario administrador"
+    description =  "Project where the admin user is authenticated"
     
-    default =  "admin"
+    default =  ""
     
     }
     
     variable  "openstack_auth_url" {
     
-    description =  "URL de la api del entorno de Openstack con /v3"
+    description =  "URL of the Openstack environment api with /v3"
     
-    default =  "http://10.24.4.60:5000/v3"
+    default =  "http://x.x.x.x:5000/v3"
     
     }
     
@@ -134,112 +135,189 @@ In the variables for the resources we must complete the following fields:
     
     }
     
-    ## Variables para recursos
+    ## Variables to create the project
     
     variable  "project_name" {
     
-    description =  "Nombre del proyecto que vamos a crear"
+    description =  "name of the project to create"
     
-    default =  "test-franco"
+    default =  ""
     
     }
     
     variable  "project_desc" {
     
-    description =  "Descripcion del proyecto que vamos a crear"
+    description =  "description of the project to create"
     
-    default =  "test-franco"
+    default =  ""
     
     }
     
     variable  "id_dominio" {
     
-    description =  "ID de dominio sobre"
+    description =  "ID of the domain where this project will be created"
     
-    default =  "043d786cdc264ba6a1dc640f4be7f732"
+    default =  ""
     
     }
-```terraform
+```
 
 
 to initialise the workspace, execute the following command.
+```hcl
 terraform init
-
+```
 validate syntax and consistency of the code
+```hcl
 terraform plan
+```
 
 apply the changes in openstack
+```hcl
 terraform apply
+```
 
+2. **second execution**
 
-deploy-project/project_userdom/user_dom/variables.tf
+    `deploy-project/project_userdom/user_dom/variables.tf`
 
 In this case it is only necessary to execute the code, since the variables are already filled in with the terraform.tfstate file, this also applies to the remaining directories.
 
 to initialise the workspace, execute the following command.
+```hcl
 terraform init
-
+```
 validate syntax and consistency of the code
+```hcl
 terraform plan
+```
 
 apply the changes in openstack
-
-``` console
+```hcl
 terraform apply
 ```
 
+`you must enter a new password for the user that is being created.`
 
-you must enter a new password for the user that is being created.
-
-
-deploy-project/components/variables.tf
+3. **third execution**
+   
+    `deploy-project/components/variables.tf`
 
 In this case we will choose the CIDR of the network and where the keys are stored.
 
-cidr_net -> network we are going to create with its mask
-folder_path -> path to the folder where the keys are stored (pub,pem)
+```terraform
+
+variable "openstack_password" {
+    description = "Password of the user of the domain with which the resources are to be created"
+    type = string
+    sensitive = true
+}
+
+variable "cidr_net" {
+    description = "CIDR network we are going to create with its mask"
+    default = ""
+}
+
+variable "ruta_carpeta" {
+  description = "path to the folder where the keys are stored (pub,pem)"
+  default = ""
+}
+```
+
 
 to initialise the workspace, execute the following command.
+```hcl
 terraform init
-
+```
 validate syntax and consistency of the code
+```hcl
 terraform plan
+```
 
 apply the changes in openstack
+```hcl
 terraform apply
+```
 
-password for the user we have just created
+`password of the user we created in the second step`
 
+4. **fourth execution**
 
-deploy-project/mv_create/variables.tf
+    `deploy-project/mv_create/variables.tf`
 
 In this step we will indicate the version of the operating system and the number of nodes to create.
 
-image_name -> image name for master and worker nodes 
-image_name_bastion -> name of the bastion image
-number_of_master -> number of master nodes
-number_of_worker-> number of worker nodes
-flavor_of_master -> flavour master nodes 
-flavor_of_worker -> flavor worker nodes 
-flavor_of_bastion -> flavor of the bastion node
-```
-variable  "flavor_of_bastion" {
-description =  "flavor para el nodo bastion"
-type =  string
-default =  "c2.m4.d50"
+```terraform
+variable "openstack_password" {
+    description = "Password of the user of the domain with which the resources are to be created"    
+    type = string
+    sensitive = true
+}
+
+variable "image_name" {
+    description = " image name for master and worker nodes "
+    default = ""
+}
+
+variable "image_name_bastion" {
+    description = "name of the bastion image"
+    default = ""
+}
+
+variable "number_of_master" {
+    description = "number of master nodes"
+    type    = number
+    default = 1
+}
+
+variable "number_of_worker" {
+    description = "number of worker nodes"
+    type    = number
+    default = 2
+}
+
+variable "flavor_of_master" {
+    description = "flavour master nodes"
+    type = string
+    default = ""
+}
+
+variable "flavor_of_worker" {
+    description = "flavor worker nodes"
+    type = string
+    default = ""
+}
+
+variable "flavor_of_bastion" {
+    description = "flavor of the bastion node"
+    type = string
+    default = ""
 }
 ```
 
 to initialise the workspace, execute the following command.
+```hcl
 terraform init
-
+```
 validate syntax and consistency of the code
+```hcl
 terraform plan
+```
 
 apply the changes in openstack
+```hcl
 terraform apply
+```
 
-password for the user we have just created
+`password of the user we created in the second step`
+
+
+**NOTE:**
+
+``this code applies to the complete creation of a project, having as reference the name of the project that is indicated.
+As an example, if the project is called TEST, the router that will be created will be called TEST-ROUTER and this will happen with all the components.``
+
+``in addition to the IDs, which are found in the resource.tf file, these will depend on the infrastructure.``
 
 
 
