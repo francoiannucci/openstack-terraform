@@ -1,8 +1,8 @@
 # openstack-terraform
-Repository on automation of a project in openstack
+## Repository on automation of a project in openstack
 
-Directory structure
-
+**Directory structure**
+```
 deploy-project/
 ├── README.md
 |
@@ -30,51 +30,62 @@ deploy-project/
     ├── outputs.tf
     ├── resource.tf
     └── variables.tf
+```
+ 
+**Its execution must be in the following order.**
+
+
+     1. deploy-project/project_userdom/project/
+     2. deploy-project/project_userdom/user_dom/
+     3. deploy-project/components/
+     4. deploy-project/mv_create/
 
  
-Its execution must be in the following order.
 
-1) deploy-project/project_userdom/project/
-2) deploy-project/project_userdom/user_dom/
-3) deploy-project/components/
-4) deploy-project/mv_create/
+**Actions performed by each code**
+
+    deploy-project/project_userdom/project/
+
+> It allows us to create a project associated to a domain and assign a
+> role to it.
+
+    deploy-project/project_userdom/user_dom/
+
+>create an openstack user to a specific project and domain
+
+    deploy-project/components/
+
+>creation of a complete network for the project, as well as security groups and SSH keys.
+
+    deploy-project/mv_create/
+
+>automates the creation of a cluster, using bastion, master and worker.
 
 
+**Prerequisites**
+It is necessary to install terraform, for this I attach the URL [hashicorp](https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli)
 
-Actions performed by each code
 
-deploy-project/project_userdom/project/
+**Code execution**
 
-It allows us to create a project associated to a domain and assign a role to it.
 
-deploy-project/project_userdom/user_dom/
-
-create an openstack user to a specific project and domain
-
-deploy-project/components/
-
-creation of a complete network for the project, as well as security groups and SSH keys.
-
-deploy-project/mv_create/
-
-automates the creation of a cluster, using bastion, master and worker.
-
-Prerequisites
-It is necessary to install terraform, for this I attach the URL
-https://developer.hashicorp.com/terraform/tutorials/aws-get-started/install-cli
-
-Code execution
-
-In all the directories, we will find a file variables.tf.
+In all the directories, we will find a file `variables.tf`
 This is the only one we will have to modify as we want to create the project.
 
-in the first two steps we will be asked for the credentials of the administrator user, in the third and fourth steps the credentials of the created user will be used.
+In the first two steps we will be asked for the credentials of the administrator user, in the third and fourth steps the credentials of the created user will be used.
 
-deploy-project/project_userdom/project/variables.tf
+It is also important to check that the `terraform.tfstate` file is generated, as we will need it for the following codes
+
+ 1. **First execution**
+
+	`deploy-project/project_userdom/project/variables.tf`
 
 For this code we will need to know the ID of the domain where we will deploy the project.
+
 To create a project in openstack, just run the following command
-openstack domain create --description ‘<description>’ <domain name>.
+
+    openstack domain create --description ‘<description>’ <domain name>
+
 All the default fields must be filled in
 The provider section will depend on the infrastructure.
 In the variables for the resources we must complete the following fields:
@@ -105,7 +116,11 @@ validate syntax and consistency of the code
 terraform plan
 
 apply the changes in openstack
+
+``` console
 terraform apply
+```
+
 
 you must enter a new password for the user that is being created.
 
@@ -140,7 +155,13 @@ number_of_worker-> number of worker nodes
 flavor_of_master -> flavour master nodes 
 flavor_of_worker -> flavor worker nodes 
 flavor_of_bastion -> flavor of the bastion node
-
+```
+variable  "flavor_of_bastion" {
+description =  "flavor para el nodo bastion"
+type =  string
+default =  "c2.m4.d50"
+}
+```
 
 to initialise the workspace, execute the following command.
 terraform init
